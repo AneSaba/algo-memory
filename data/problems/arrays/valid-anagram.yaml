@@ -1,0 +1,39 @@
+id: lc-0242-valid-anagram
+title: Valid Anagram
+source: LeetCode
+sourceId: 242
+slug: valid-anagram
+difficulty: easy
+topics:
+  - arrays
+  - hashmap
+patternTags:
+  - Arrays & Hashing
+languageSolutions: []
+status: learning
+dates:
+  firstSeen: '2026-03-16'
+  firstSolved: '2026-03-16'
+  lastReviewed: null
+  nextReview: '2026-03-16'
+spacedRepetition:
+  intervalDays: 1
+  easeFactor: 2.5
+  stability: 0.1
+  memoryScore: 50
+performance:
+  totalReviews: 0
+  solvedClean: 0
+  solvedStruggle: 0
+  neededHint: 0
+  failed: 0
+  avgConfidence: 0
+  avgTimeMinutes: 0
+notes:
+  summary: ''
+  commonMistakes: []
+  recallChecklist: []
+  masteryNotes: []
+links:
+  solutionPath: null
+  notesPath: problems/arrays/valid-anagram.yaml
