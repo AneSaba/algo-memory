@@ -231,14 +231,8 @@ function AddProblemModal({ prefill, onClose, onAdded }: AddProblemModalProps) {
 
 // ── Recommendation Card ────────────────────────────────────────────────────────
 
-function neetcodeUrl(title: string): string {
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  return `https://neetcode.io/problems/${slug}`
-}
-
 function RecCard({ rec, onAdd }: { rec: Rec; onAdd: (rec: Rec) => void }) {
   const { ncProblem: nc } = rec
-  const problemUrl = neetcodeUrl(nc.title)
   return (
     <div className="rounded-lg border border-border bg-card p-4 flex flex-col gap-3 transition-colors hover:border-primary/30">
       <div className="flex items-start justify-between gap-3">
@@ -255,7 +249,7 @@ function RecCard({ rec, onAdd }: { rec: Rec; onAdd: (rec: Rec) => void }) {
           </div>
         </div>
         <div className="flex gap-1.5 shrink-0">
-          <a href={problemUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground" title="Open on NeetCode">
+          <a href={nc.url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
             <ExternalLink size={14} />
           </a>
           <button onClick={() => onAdd(rec)} className="p-1.5 rounded hover:bg-primary/10 transition-colors text-primary" title="Add to tracker">
