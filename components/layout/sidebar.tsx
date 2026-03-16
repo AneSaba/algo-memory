@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, ListChecks, BarChart2, Activity, Brain } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ListChecks, BarChart2, Activity, Brain, LineChart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const nav = [
@@ -10,6 +10,7 @@ const nav = [
   { href: '/problems', label: 'Problems', icon: ListChecks },
   { href: '/topics', label: 'Topics', icon: BookOpen },
   { href: '/activity', label: 'Activity', icon: Activity },
+  { href: '/analytics', label: 'Analytics', icon: LineChart },
 ]
 
 export function Sidebar() {
