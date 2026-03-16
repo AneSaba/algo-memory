@@ -279,8 +279,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [prefill, setPrefill] = useState<AddProblemModalProps['prefill']>(undefined)
-  const [randomizing, setRandomizing] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
+  const [randomMode, setRandomMode] = useState(false)
+  const [randomRec, setRandomRec] = useState<NCProblem | null>(null)
+  const [randomLoading, setRandomLoading] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -291,15 +292,21 @@ export default function HomePage() {
 
   useEffect(() => { load() }, [])
 
-  async function addRandom() {
-    setRandomizing(true)
-    const res = await fetch('/api/problems/random', { method: 'POST' })
-    const data = await res.json()
-    setRandomizing(false)
-    if (res.ok) {
-      setToast(`Added: ${data.title}`)
-      setTimeout(() => setToast(null), 3000)
-      load()
+  async function fetchRandom(excludeId?: string) {
+    setRandomLoading(true)
+    const url = excludeId ? `/api/problems/random?exclude=${excludeId}` : '/api/problems/random'
+    const data = await fetch(url).then((r) => r.json()).catch(() => null)
+    setRandomRec(data)
+    setRandomLoading(false)
+  }
+
+  async function toggleRandom() {
+    if (randomMode) {
+      setRandomMode(false)
+      setRandomRec(null)
+    } else {
+      setRandomMode(true)
+      await fetchRandom()
     }
   }
 
@@ -316,39 +323,106 @@ export default function HomePage() {
     setShowModal(true)
   }
 
+  function handleAddRandom() {
+    if (!randomRec) return
+    setPrefill({
+      title: randomRec.title,
+      lcId: randomRec.lcId,
+      difficulty: randomRec.difficulty,
+      topics: randomRec.topics,
+      pattern: randomRec.pattern,
+      url: randomRec.url,
+    })
+    setShowModal(true)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Recommended</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Personalized to your weak areas and pattern gaps</p>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            {randomMode ? 'Random mode — click the card for a new problem' : 'Personalized to your weak areas and pattern gaps'}
+          </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="p-2 rounded-md border border-border hover:bg-accent transition-colors text-muted-foreground" title="Refresh">
-            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-          </button>
+          {!randomMode && (
+            <button onClick={load} className="p-2 rounded-md border border-border hover:bg-accent transition-colors text-muted-foreground" title="Refresh">
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+            </button>
+          )}
           <button
-            onClick={addRandom}
-            disabled={randomizing}
-            className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-sm hover:bg-accent transition-colors disabled:opacity-50"
-            title="Add a random problem"
+            onClick={toggleRandom}
+            className={cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-colors',
+              randomMode
+                ? 'border-primary/50 bg-primary/10 text-primary'
+                : 'border-border hover:bg-accent text-muted-foreground hover:text-foreground'
+            )}
           >
-            <Shuffle size={15} className={randomizing ? 'animate-spin' : ''} />
-            Random
+            <Shuffle size={15} />
+            {randomMode ? 'Exit random' : 'Random'}
           </button>
-          <button
-            onClick={() => { setPrefill(undefined); setShowModal(true) }}
-            className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            <Plus size={15} />
-            Add Problem
-          </button>
+          {!randomMode && (
+            <button
+              onClick={() => { setPrefill(undefined); setShowModal(true) }}
+              className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              <Plus size={15} />
+              Add Problem
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Rec grid */}
-      {loading ? (
+      {/* Random mode — single card */}
+      {randomMode ? (
+        <div className="max-w-md">
+          {randomLoading || !randomRec ? (
+            <div className="rounded-lg border border-border bg-card p-4 h-28 animate-pulse" />
+          ) : (
+            <div
+              onClick={() => fetchRandom(randomRec.id)}
+              className="rounded-lg border border-primary/30 bg-card p-5 flex flex-col gap-4 cursor-pointer hover:border-primary/60 transition-colors group"
+              title="Click for a different problem"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-semibold">{randomRec.title}</h3>
+                    <span className={cn('text-xs font-medium capitalize', diffColor(randomRec.difficulty))}>{randomRec.difficulty}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {randomRec.topics.slice(0, 3).map((t) => (
+                      <span key={t} className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{t}</span>
+                    ))}
+                    <span className="text-xs text-muted-foreground">· {randomRec.pattern}</span>
+                  </div>
+                </div>
+                <Shuffle size={15} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-1" />
+              </div>
+              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                <a
+                  href={randomRec.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 text-center py-2 rounded-md border border-border text-sm hover:bg-accent transition-colors"
+                >
+                  Open on LeetCode
+                </a>
+                <button
+                  onClick={handleAddRandom}
+                  className="flex-1 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Add to Tracker
+                </button>
+              </div>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground mt-3 text-center">Click the card to shuffle · Add to Tracker to start reviewing</p>
+        </div>
+      ) : loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-lg border border-border bg-card p-4 h-24 animate-pulse" />
@@ -370,15 +444,8 @@ export default function HomePage() {
         <AddProblemModal
           prefill={prefill}
           onClose={() => setShowModal(false)}
-          onAdded={load}
+          onAdded={() => { load(); setRandomMode(false); setRandomRec(null) }}
         />
-      )}
-
-      {/* Toast */}
-      {toast && (
-        <div className="fixed bottom-6 right-6 bg-card border border-primary/40 text-sm px-4 py-3 rounded-lg shadow-lg text-primary animate-in fade-in slide-in-from-bottom-2">
-          {toast}
-        </div>
       )}
     </div>
   )
