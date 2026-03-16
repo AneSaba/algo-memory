@@ -1,0 +1,48 @@
+id: lc-0001-two-sum
+title: Two Sum
+source: LeetCode
+sourceId: 1
+slug: two-sum
+difficulty: easy
+topics:
+  - arrays
+  - hashmap
+patternTags:
+  - complement-lookup
+languageSolutions:
+  - python
+status: mastered
+
+dates:
+  firstSeen: "2026-03-01"
+  firstSolved: "2026-03-01"
+  lastReviewed: "2026-03-14"
+  nextReview: "2026-04-13"
+
+spacedRepetition:
+  intervalDays: 30
+  easeFactor: 2.6
+  stability: 0.95
+  memoryScore: 92
+
+performance:
+  totalReviews: 5
+  solvedClean: 4
+  solvedStruggle: 1
+  neededHint: 0
+  failed: 0
+  avgConfidence: 4.8
+  avgTimeMinutes: 5
+
+notes:
+  summary: "Store complement in hashmap. One pass."
+  commonMistakes:
+    - Using O(n^2) brute force
+  recallChecklist:
+    - complement = target - num
+    - Check hashmap first, then store
+  masteryNotes: []
+
+links:
+  solutionPath: null
+  notesPath: "problems/arrays/two-sum.yaml"
