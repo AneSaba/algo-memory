@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Plus, ExternalLink, RefreshCw } from 'lucide-react'
+import { Plus, ExternalLink, RefreshCw, Shuffle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type ReasonTag = 'weak-topic' | 'new-pattern' | 'pattern-building' | 'custom'
@@ -279,6 +279,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [prefill, setPrefill] = useState<AddProblemModalProps['prefill']>(undefined)
+  const [randomizing, setRandomizing] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
@@ -288,6 +290,18 @@ export default function HomePage() {
   }
 
   useEffect(() => { load() }, [])
+
+  async function addRandom() {
+    setRandomizing(true)
+    const res = await fetch('/api/problems/random', { method: 'POST' })
+    const data = await res.json()
+    setRandomizing(false)
+    if (res.ok) {
+      setToast(`Added: ${data.title}`)
+      setTimeout(() => setToast(null), 3000)
+      load()
+    }
+  }
 
   function handleAdd(rec: Rec) {
     const nc = rec.ncProblem
@@ -313,6 +327,15 @@ export default function HomePage() {
         <div className="flex gap-2">
           <button onClick={load} className="p-2 rounded-md border border-border hover:bg-accent transition-colors text-muted-foreground" title="Refresh">
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+          </button>
+          <button
+            onClick={addRandom}
+            disabled={randomizing}
+            className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-sm hover:bg-accent transition-colors disabled:opacity-50"
+            title="Add a random problem"
+          >
+            <Shuffle size={15} className={randomizing ? 'animate-spin' : ''} />
+            Random
           </button>
           <button
             onClick={() => { setPrefill(undefined); setShowModal(true) }}
@@ -349,6 +372,13 @@ export default function HomePage() {
           onClose={() => setShowModal(false)}
           onAdded={load}
         />
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 bg-card border border-primary/40 text-sm px-4 py-3 rounded-lg shadow-lg text-primary animate-in fade-in slide-in-from-bottom-2">
+          {toast}
+        </div>
       )}
     </div>
   )
