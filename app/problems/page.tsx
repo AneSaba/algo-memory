@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Trash2 } from 'lucide-react'
 
 type Problem = {
   id: string
@@ -22,10 +23,22 @@ export default function ProblemsPage() {
   const [problems, setProblems] = useState<Problem[]>([])
   const [search, setSearch] = useState('')
   const [topicFilter, setTopicFilter] = useState('')
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
-  useEffect(() => {
+  function load() {
     fetch('/api/problems').then((r) => r.json()).then(setProblems)
-  }, [])
+  }
+
+  useEffect(() => { load() }, [])
+
+  async function handleDelete(id: string) {
+    setDeleting(id)
+    await fetch(`/api/problems/${id}`, { method: 'DELETE' })
+    setDeleting(null)
+    setConfirmId(null)
+    load()
+  }
 
   const topics = [...new Set(problems.flatMap((p) => p.topics))].sort()
   const filtered = problems.filter((p) => {
@@ -67,11 +80,12 @@ export default function ProblemsPage() {
               <th className="text-left px-4 py-3 font-medium">Difficulty</th>
               <th className="text-left px-4 py-3 font-medium">Score</th>
               <th className="text-left px-4 py-3 font-medium">Next Review</th>
+              <th className="px-4 py-3" />
             </tr>
           </thead>
           <tbody>
             {filtered.map((p) => (
-              <tr key={p.id} className="border-b border-border/50 hover:bg-accent/30">
+              <tr key={p.id} className="border-b border-border/50 hover:bg-accent/30 group">
                 <td className="px-4 py-3">
                   <Link href={`/problems/${p.id}`} className="hover:text-primary transition-colors">{p.title}</Link>
                 </td>
@@ -79,6 +93,31 @@ export default function ProblemsPage() {
                 <td className={`px-4 py-3 capitalize ${difficultyColor(p.difficulty)}`}>{p.difficulty}</td>
                 <td className="px-4 py-3">{p.spacedRepetition.memoryScore}</td>
                 <td className="px-4 py-3 text-muted-foreground">{p.dates.nextReview ?? '—'}</td>
+                <td className="px-4 py-3 text-right">
+                  {confirmId === p.id ? (
+                    <div className="flex items-center justify-end gap-2">
+                      <span className="text-xs text-muted-foreground">Remove?</span>
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        disabled={deleting === p.id}
+                        className="text-xs text-destructive hover:underline disabled:opacity-50"
+                      >
+                        {deleting === p.id ? 'Removing...' : 'Yes'}
+                      </button>
+                      <button onClick={() => setConfirmId(null)} className="text-xs text-muted-foreground hover:underline">
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmId(p.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                      title="Remove problem"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

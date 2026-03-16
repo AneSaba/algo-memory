@@ -39,3 +39,15 @@ export function saveProblem(problem: Problem): void {
   const filePath = path.join(dir, `${problem.slug}.yaml`)
   fs.writeFileSync(filePath, yaml.dump(problem), 'utf-8')
 }
+
+export function deleteProblem(id: string): boolean {
+  const problem = loadProblem(id)
+  if (!problem) return false
+  const topic = problem.topics[0] ?? 'uncategorized'
+  const filePath = path.join(getDataDir(), 'problems', topic, `${problem.slug}.yaml`)
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath)
+    return true
+  }
+  return false
+}

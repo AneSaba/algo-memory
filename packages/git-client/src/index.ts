@@ -28,6 +28,14 @@ export async function getRecentCommits(limit = 20) {
   return log.all
 }
 
+export async function commitRemove(problemSlug: string): Promise<string> {
+  const git = getGit()
+  await git.add('.')
+  const message = `remove(problem): ${problemSlug}`
+  const commit = await git.commit(message)
+  return commit.commit
+}
+
 export async function isGitRepo(): Promise<boolean> {
   try {
     const git = getGit()
