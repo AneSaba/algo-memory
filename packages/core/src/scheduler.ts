@@ -37,10 +37,7 @@ export function updateSchedule(
       consecutiveFails++
       easeFactor = Math.max(1.3, easeFactor - 0.2)
       memoryScore = Math.max(0, memoryScore - 15)
-      // 1st fail → tomorrow, 2nd fail → same day, 3rd+ → pinned (interval 0 = today)
-      if (consecutiveFails === 1) intervalDays = 1
-      else if (consecutiveFails === 2) intervalDays = 0
-      else intervalDays = 0
+      intervalDays = 0 // always back today
       break
   }
 
