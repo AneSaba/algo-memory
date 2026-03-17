@@ -5,7 +5,7 @@ import { isOverdue, isDueToday } from '@/packages/core/src/scheduler'
 export async function GET() {
   const problems = loadAllProblems()
   const due = problems
-    .filter((p) => isDueToday(p.dates.nextReview) || isOverdue(p.dates.nextReview))
+    .filter((p) => p.status !== 'mastered' && (isDueToday(p.dates.nextReview) || isOverdue(p.dates.nextReview)))
     .map((p) => ({
       id: p.id,
       title: p.title,

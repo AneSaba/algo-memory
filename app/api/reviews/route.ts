@@ -31,7 +31,13 @@ export async function POST(req: Request) {
   problem.spacedRepetition.consecutiveFails = updated.consecutiveFails
   problem.spacedRepetition.struggling = updated.struggling
   problem.dates.lastReviewed = new Date().toISOString().split('T')[0]
-  problem.dates.nextReview = getNextReviewDate(updated.intervalDays)
+
+  if (updated.mastered) {
+    problem.status = 'mastered'
+    problem.dates.nextReview = null
+  } else {
+    problem.dates.nextReview = getNextReviewDate(updated.intervalDays)
+  }
 
   problem.performance.totalReviews++
   if (result === 'solved_clean') problem.performance.solvedClean++
@@ -48,5 +54,5 @@ export async function POST(req: Request) {
     // git not configured yet — ok for local dev
   }
 
-  return NextResponse.json({ success: true, gitCommit, nextReview: problem.dates.nextReview })
+  return NextResponse.json({ success: true, gitCommit, nextReview: problem.dates.nextReview, mastered: updated.mastered })
 }

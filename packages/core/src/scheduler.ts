@@ -6,6 +6,7 @@ export interface SchedulerUpdate {
   memoryScore: number
   consecutiveFails: number
   struggling: boolean
+  mastered: boolean
 }
 
 function cleanMultiplier(score: number): number {
@@ -53,8 +54,9 @@ export function updateSchedule(
   }
 
   const struggling = consecutiveFails >= 3
+  const mastered = memoryScore >= 100
 
-  return { intervalDays, easeFactor, memoryScore, consecutiveFails, struggling }
+  return { intervalDays, easeFactor, memoryScore, consecutiveFails, struggling, mastered }
 }
 
 export function getNextReviewDate(intervalDays: number): string {

@@ -19,6 +19,7 @@ export function ReviewSession() {
   const [revealed, setRevealed] = useState(false)
   const [done, setDone] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [justMastered, setJustMastered] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/dashboard/due')
@@ -34,15 +35,25 @@ export function ReviewSession() {
   async function submitResult(result: ReviewResult) {
     if (!problem || submitting) return
     setSubmitting(true)
-    await fetch('/api/reviews', {
+    const res = await fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ problemId: problem.id, result, confidence: 3, timeMinutes: 20, notes: '' }),
     })
+    const data = await res.json()
     setSubmitting(false)
     setRevealed(false)
-    if (current + 1 >= queue.length) setDone(true)
-    else setCurrent((c) => c + 1)
+    if (data.mastered) {
+      setJustMastered(problem.title)
+      setTimeout(() => {
+        setJustMastered(null)
+        if (current + 1 >= queue.length) setDone(true)
+        else setCurrent((c) => c + 1)
+      }, 2500)
+    } else {
+      if (current + 1 >= queue.length) setDone(true)
+      else setCurrent((c) => c + 1)
+    }
   }
 
   if (done) return (
@@ -50,6 +61,14 @@ export function ReviewSession() {
       <p className="text-xl font-semibold text-primary">All caught up!</p>
       <p className="text-muted-foreground mt-2">No more problems due. Come back tomorrow.</p>
       <Link href="/" className="mt-4 inline-block text-sm text-primary hover:underline">Back to dashboard</Link>
+    </div>
+  )
+
+  if (justMastered) return (
+    <div className="rounded-lg border border-primary/40 bg-primary/5 p-10 text-center space-y-2">
+      <p className="text-3xl">🎓</p>
+      <p className="text-xl font-bold text-primary">Mastered!</p>
+      <p className="text-muted-foreground text-sm">{justMastered} has been removed from your review queue.</p>
     </div>
   )
 
