@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     easeFactor: old.easeFactor,
     memoryScore: old.memoryScore,
     consecutiveFails: old.consecutiveFails ?? 0,
+    cleanStreakAfterFail: old.cleanStreakAfterFail ?? 0,
   })
 
   problem.spacedRepetition.intervalDays = updated.intervalDays
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
   problem.spacedRepetition.memoryScore = updated.memoryScore
   problem.spacedRepetition.consecutiveFails = updated.consecutiveFails
   problem.spacedRepetition.struggling = updated.struggling
+  problem.spacedRepetition.cleanStreakAfterFail = updated.cleanStreakAfterFail
   problem.dates.lastReviewed = new Date().toISOString().split('T')[0]
 
   if (updated.mastered) {

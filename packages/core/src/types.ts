@@ -26,6 +26,7 @@ export interface Problem {
     memoryScore: number
     consecutiveFails: number
     struggling: boolean
+    cleanStreakAfterFail: number
   }
   performance: {
     totalReviews: number
