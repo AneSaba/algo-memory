@@ -13,8 +13,17 @@ export async function GET() {
       difficulty: p.difficulty,
       memoryScore: p.spacedRepetition.memoryScore,
       overdue: isOverdue(p.dates.nextReview),
+      struggling: p.spacedRepetition.struggling ?? false,
+      consecutiveFails: p.spacedRepetition.consecutiveFails ?? 0,
     }))
-    .sort((a, b) => a.memoryScore - b.memoryScore)
+    .sort((a, b) => {
+      // struggling always first
+      if (a.struggling !== b.struggling) return a.struggling ? -1 : 1
+      // then overdue
+      if (a.overdue !== b.overdue) return a.overdue ? -1 : 1
+      // then lowest score
+      return a.memoryScore - b.memoryScore
+    })
 
   return NextResponse.json(due)
 }

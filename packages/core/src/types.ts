@@ -24,6 +24,8 @@ export interface Problem {
     easeFactor: number
     stability: number
     memoryScore: number
+    consecutiveFails: number
+    struggling: boolean
   }
   performance: {
     totalReviews: number

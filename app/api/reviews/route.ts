@@ -22,11 +22,14 @@ export async function POST(req: Request) {
     intervalDays: old.intervalDays,
     easeFactor: old.easeFactor,
     memoryScore: old.memoryScore,
+    consecutiveFails: old.consecutiveFails ?? 0,
   })
 
   problem.spacedRepetition.intervalDays = updated.intervalDays
   problem.spacedRepetition.easeFactor = updated.easeFactor
   problem.spacedRepetition.memoryScore = updated.memoryScore
+  problem.spacedRepetition.consecutiveFails = updated.consecutiveFails
+  problem.spacedRepetition.struggling = updated.struggling
   problem.dates.lastReviewed = new Date().toISOString().split('T')[0]
   problem.dates.nextReview = getNextReviewDate(updated.intervalDays)
 

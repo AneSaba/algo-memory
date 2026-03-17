@@ -8,7 +8,7 @@ type Problem = {
   topics: string[]
   difficulty: string
   notes: { summary: string; recallChecklist: string[]; commonMistakes: string[] }
-  spacedRepetition: { memoryScore: number; intervalDays: number }
+  spacedRepetition: { memoryScore: number; intervalDays: number; struggling?: boolean; consecutiveFails?: number }
 }
 
 type ReviewResult = 'solved_clean' | 'solved_struggle' | 'needed_hint' | 'failed'
@@ -60,7 +60,12 @@ export function ReviewSession() {
       <div className="rounded-lg border border-border bg-card p-6 space-y-3">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold">{problem.title}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">{problem.title}</h2>
+              {problem.spacedRepetition.struggling && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/15 text-red-400 border border-destructive/30">Struggling</span>
+              )}
+            </div>
             <div className="flex gap-2 mt-1">
               {problem.topics.map((t) => (
                 <span key={t} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">{t}</span>
