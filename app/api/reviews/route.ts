@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { loadProblem, saveProblem } from '@/packages/core/src/problem-store'
 import { updateSchedule, getNextReviewDate } from '@/packages/core/src/scheduler'
 import { ReviewResult } from '@/packages/core/src/types'
-import { commitReview } from '@/packages/git-client/src/index'
+import { commitReview, getGit } from '@/packages/git-client/src/index'
 
 export async function POST(req: Request) {
   const body = await req.json()
@@ -47,11 +47,16 @@ export async function POST(req: Request) {
   else if (result === 'needed_hint') problem.performance.neededHint++
   else if (result === 'failed') problem.performance.failed++
 
+  if (result === 'failed' && notes && notes.trim()) {
+    problem.notes.commonMistakes = [...problem.notes.commonMistakes, notes.trim()]
+  }
+
   saveProblem(problem)
 
   let gitCommit: string | undefined
   try {
     gitCommit = await commitReview(problem.slug, result)
+    await getGit().push()
   } catch {
     // git not configured yet — ok for local dev
   }

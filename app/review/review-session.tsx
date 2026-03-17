@@ -20,6 +20,9 @@ export function ReviewSession() {
   const [done, setDone] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [justMastered, setJustMastered] = useState<string | null>(null)
+  const [failNote, setFailNote] = useState('')
+  const [showFailNote, setShowFailNote] = useState(false)
+  const [pendingResult, setPendingResult] = useState<ReviewResult | null>(null)
 
   useEffect(() => {
     fetch('/api/dashboard/due')
@@ -32,17 +35,20 @@ export function ReviewSession() {
 
   const problem = queue[current]
 
-  async function submitResult(result: ReviewResult) {
+  async function submitResult(result: ReviewResult, note = '') {
     if (!problem || submitting) return
     setSubmitting(true)
     const res = await fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ problemId: problem.id, result, confidence: 3, timeMinutes: 20, notes: '' }),
+      body: JSON.stringify({ problemId: problem.id, result, confidence: 3, timeMinutes: 20, notes: note }),
     })
     const data = await res.json()
     setSubmitting(false)
     setRevealed(false)
+    setShowFailNote(false)
+    setFailNote('')
+    setPendingResult(null)
     if (data.mastered) {
       setJustMastered(problem.title)
       setTimeout(() => {
@@ -53,6 +59,15 @@ export function ReviewSession() {
     } else {
       if (current + 1 >= queue.length) setDone(true)
       else setCurrent((c) => c + 1)
+    }
+  }
+
+  function handleResultClick(result: ReviewResult) {
+    if (result === 'failed') {
+      setPendingResult('failed')
+      setShowFailNote(true)
+    } else {
+      submitResult(result)
     }
   }
 
@@ -133,23 +148,57 @@ export function ReviewSession() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        {([
-          ['solved_clean', 'Solved Clean', 'bg-green-600 hover:bg-green-500'],
-          ['solved_struggle', 'Struggled', 'bg-yellow-600 hover:bg-yellow-500'],
-          ['needed_hint', 'Needed Hint', 'bg-orange-600 hover:bg-orange-500'],
-          ['failed', 'Failed', 'bg-red-700 hover:bg-red-600'],
-        ] as [ReviewResult, string, string][]).map(([result, label, cls]) => (
-          <button
-            key={result}
-            onClick={() => submitResult(result)}
-            disabled={submitting}
-            className={`py-3 rounded-md text-white text-sm font-medium transition-colors disabled:opacity-50 ${cls}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {/* Fail note panel */}
+      {showFailNote && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
+          <p className="text-sm font-medium text-red-400">What tripped you up? (optional)</p>
+          <textarea
+            value={failNote}
+            onChange={(e) => setFailNote(e.target.value)}
+            rows={3}
+            autoFocus
+            placeholder="e.g. Forgot to handle edge case, blanked on the approach..."
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-destructive resize-none"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => submitResult('failed', failNote)}
+              disabled={submitting}
+              className="flex-1 py-2 rounded-md bg-red-700 hover:bg-red-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              {submitting ? 'Saving...' : 'Submit'}
+            </button>
+            <button
+              onClick={() => submitResult('failed', '')}
+              disabled={submitting}
+              className="px-4 py-2 rounded-md border border-border text-sm hover:bg-accent transition-colors disabled:opacity-50"
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Result buttons — hidden while fail note is open */}
+      {!showFailNote && (
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            ['solved_clean', 'Solved Clean', 'bg-green-600 hover:bg-green-500'],
+            ['solved_struggle', 'Struggled', 'bg-yellow-600 hover:bg-yellow-500'],
+            ['needed_hint', 'Needed Hint', 'bg-orange-600 hover:bg-orange-500'],
+            ['failed', 'Failed', 'bg-red-700 hover:bg-red-600'],
+          ] as [ReviewResult, string, string][]).map(([result, label, cls]) => (
+            <button
+              key={result}
+              onClick={() => handleResultClick(result)}
+              disabled={submitting}
+              className={`py-3 rounded-md text-white text-sm font-medium transition-colors disabled:opacity-50 ${cls}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
