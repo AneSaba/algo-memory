@@ -8,6 +8,17 @@ export interface SchedulerUpdate {
   struggling: boolean
 }
 
+function cleanMultiplier(score: number): number {
+  if (score >= 80) return 2.5
+  if (score >= 60) return 2.0
+  if (score >= 40) return 1.6
+  return 1.3
+}
+
+function struggleMultiplier(score: number): number {
+  return score >= 60 ? 1.4 : 1.1
+}
+
 export function updateSchedule(
   result: ReviewResult,
   current: { intervalDays: number; easeFactor: number; memoryScore: number; consecutiveFails?: number }
@@ -17,13 +28,13 @@ export function updateSchedule(
 
   switch (result) {
     case 'solved_clean':
-      intervalDays = Math.max(1, Math.round(intervalDays * 2.0))
+      intervalDays = Math.max(1, Math.round(intervalDays * cleanMultiplier(memoryScore)))
       easeFactor = Math.min(2.8, easeFactor + 0.1)
       memoryScore = Math.min(100, memoryScore + 10)
       consecutiveFails = 0
       break
     case 'solved_struggle':
-      intervalDays = Math.max(1, Math.round(intervalDays * 1.4))
+      intervalDays = Math.max(1, Math.round(intervalDays * struggleMultiplier(memoryScore)))
       memoryScore = Math.min(100, memoryScore + 4)
       consecutiveFails = 0
       break
