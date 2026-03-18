@@ -120,7 +120,23 @@ export function ReviewSession() {
               <span className="text-xs text-muted-foreground capitalize">· {problem.difficulty}</span>
             </div>
           </div>
-          <span className="text-sm text-muted-foreground shrink-0">{current + 1} / {queue.length}</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => { setCurrent((c) => c - 1); setRevealed(false); setShowFailNote(false); setFailNote('') }}
+              disabled={current === 0}
+              className="px-2 py-0.5 rounded border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+            >
+              ‹
+            </button>
+            <span className="text-sm text-muted-foreground">{current + 1} / {queue.length}</span>
+            <button
+              onClick={() => { setCurrent((c) => c + 1); setRevealed(false); setShowFailNote(false); setFailNote('') }}
+              disabled={current === queue.length - 1}
+              className="px-2 py-0.5 rounded border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+            >
+              ›
+            </button>
+          </div>
         </div>
 
         {!revealed ? (
