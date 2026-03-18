@@ -52,16 +52,21 @@ export function ReviewSession() {
     setShowFailNote(false)
     setFailNote('')
     setPendingResult(null)
+
+    const newQueue = queue.filter((p) => p.id !== problem.id)
+
     if (data.mastered) {
       setJustMastered(problem.title)
       setTimeout(() => {
         setJustMastered(null)
-        if (current + 1 >= queue.length) setDone(true)
-        else setCurrent((c) => c + 1)
+        setQueue(newQueue)
+        if (newQueue.length === 0) setDone(true)
+        else setCurrent((c) => Math.min(c, newQueue.length - 1))
       }, 2500)
     } else {
-      if (current + 1 >= queue.length) setDone(true)
-      else setCurrent((c) => c + 1)
+      setQueue(newQueue)
+      if (newQueue.length === 0) setDone(true)
+      else setCurrent((c) => Math.min(c, newQueue.length - 1))
     }
   }
 
