@@ -7,6 +7,9 @@ type Problem = {
   title: string
   topics: string[]
   difficulty: string
+  source: string
+  sourceId?: number
+  slug: string
   notes: { summary: string; recallChecklist: string[]; commonMistakes: string[] }
   spacedRepetition: { memoryScore: number; intervalDays: number; struggling?: boolean; consecutiveFails?: number }
 }
@@ -96,6 +99,16 @@ export function ReviewSession() {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold">{problem.title}</h2>
+              {problem.sourceId && (
+                <a
+                  href={`https://leetcode.com/problems/${problem.slug}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-2 py-0.5 rounded border border-border text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+                >
+                  Open ↗
+                </a>
+              )}
               {problem.spacedRepetition.struggling && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/15 text-red-400 border border-destructive/30">Struggling</span>
               )}

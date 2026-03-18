@@ -49,6 +49,9 @@ export async function POST(req: Request) {
       easeFactor: 2.5,
       stability: 0.1,
       memoryScore: 50,
+      consecutiveFails: 0,
+      struggling: false,
+      cleanStreakAfterFail: 0,
     },
     performance: {
       totalReviews: 0,
