@@ -36,6 +36,17 @@ export function Sidebar() {
           {label}
         </Link>
       ))}
+      <div className="mt-auto pt-4 border-t border-border">
+        <a
+          href="https://neetcode.io/practice/practice/neetcode150"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        >
+          <BarChart2 size={16} />
+          NeetCode 150
+        </a>
+      </div>
     </aside>
   )
 }
