@@ -47,7 +47,7 @@ export async function POST(req: Request) {
   else if (result === 'needed_hint') problem.performance.neededHint++
   else if (result === 'failed') problem.performance.failed++
 
-  if (result === 'failed' && notes && notes.trim()) {
+  if ((result === 'failed' || result === 'needed_hint') && notes && notes.trim()) {
     problem.notes.commonMistakes = [...problem.notes.commonMistakes, notes.trim()]
   }
 

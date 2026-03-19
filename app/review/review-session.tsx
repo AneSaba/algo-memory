@@ -71,8 +71,8 @@ export function ReviewSession() {
   }
 
   function handleResultClick(result: ReviewResult) {
-    if (result === 'failed') {
-      setPendingResult('failed')
+    if (result === 'failed' || result === 'needed_hint') {
+      setPendingResult(result)
       setShowFailNote(true)
     } else {
       submitResult(result)
@@ -185,7 +185,7 @@ export function ReviewSession() {
       {/* Fail note panel */}
       {showFailNote && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
-          <p className="text-sm font-medium text-red-400">What tripped you up? (optional)</p>
+          <p className="text-sm font-medium text-red-400">{pendingResult === 'needed_hint' ? 'What did you need a hint for? (optional)' : 'What tripped you up? (optional)'}</p>
           <textarea
             value={failNote}
             onChange={(e) => setFailNote(e.target.value)}
