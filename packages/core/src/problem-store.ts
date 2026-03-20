@@ -1,13 +1,26 @@
 import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
+import { execSync } from 'child_process'
 import { Problem } from './types'
 
 export function getDataDir(): string {
   return process.env.ALGO_DATA_DIR ?? path.join(process.cwd(), 'data')
 }
 
+let lastPull = 0
+
+function pullData() {
+  const now = Date.now()
+  if (now - lastPull < 5000) return // debounce: at most once per 5s
+  lastPull = now
+  try {
+    execSync('git pull --ff-only', { cwd: getDataDir(), stdio: 'ignore' })
+  } catch {}
+}
+
 export function loadAllProblems(): Problem[] {
+  pullData()
   const dir = path.join(getDataDir(), 'problems')
   if (!fs.existsSync(dir)) return []
   const problems: Problem[] = []
