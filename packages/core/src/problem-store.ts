@@ -12,7 +12,7 @@ let lastPull = 0
 
 function pullData() {
   const now = Date.now()
-  if (now - lastPull < 5000) return // debounce: at most once per 5s
+  if (now - lastPull < 60 * 60 * 1000) return // at most once per hour
   lastPull = now
   try {
     execSync('git pull --ff-only', { cwd: getDataDir(), stdio: 'ignore' })
