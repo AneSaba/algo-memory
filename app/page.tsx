@@ -242,9 +242,6 @@ function RecCard({ rec, onAdd }: { rec: Rec; onAdd: (rec: Rec) => void }) {
             <span className={cn('text-xs font-medium capitalize', diffColor(nc.difficulty))}>{nc.difficulty}</span>
           </div>
           <div className="flex flex-wrap gap-1 mt-1.5">
-            {nc.topics.slice(0, 3).map((t) => (
-              <span key={t} className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{t}</span>
-            ))}
             <span className="text-xs text-muted-foreground">· {nc.pattern}</span>
           </div>
         </div>
@@ -394,9 +391,6 @@ export default function HomePage() {
                     <span className={cn('text-xs font-medium capitalize', diffColor(randomRec.difficulty))}>{randomRec.difficulty}</span>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-1.5">
-                    {randomRec.topics.slice(0, 3).map((t) => (
-                      <span key={t} className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{t}</span>
-                    ))}
                     <span className="text-xs text-muted-foreground">· {randomRec.pattern}</span>
                   </div>
                 </div>

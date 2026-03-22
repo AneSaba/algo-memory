@@ -119,9 +119,6 @@ export function ReviewSession() {
               )}
             </div>
             <div className="flex gap-2 mt-1">
-              {problem.topics.map((t) => (
-                <span key={t} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">{t}</span>
-              ))}
               <span className="text-xs text-muted-foreground capitalize">· {problem.difficulty}</span>
             </div>
           </div>

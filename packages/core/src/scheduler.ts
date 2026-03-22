@@ -81,19 +81,22 @@ export function updateSchedule(
   return { intervalDays, easeFactor, memoryScore, consecutiveFails, struggling, mastered, cleanStreakAfterFail }
 }
 
+function localDateString(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export function getNextReviewDate(intervalDays: number): string {
   const d = new Date()
   d.setDate(d.getDate() + Math.max(0, intervalDays))
-  return d.toISOString().split('T')[0]
+  return localDateString(d)
 }
 
 export function isOverdue(nextReview: string | null): boolean {
   if (!nextReview) return false
-  return new Date(nextReview) < new Date(new Date().toISOString().split('T')[0])
+  return nextReview < localDateString()
 }
 
 export function isDueToday(nextReview: string | null): boolean {
   if (!nextReview) return false
-  const today = new Date().toISOString().split('T')[0]
-  return nextReview === today
+  return nextReview === localDateString()
 }
